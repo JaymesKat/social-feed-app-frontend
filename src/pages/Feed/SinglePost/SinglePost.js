@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import Image from '../../../components/Image/Image';
 import './SinglePost.css';
 
+const BACKEND_HOST = process.env.REACT_APP_BACKEND_HOST;
+const BACKEND_PORT = process.env.REACT_APP_BACKEND_PORT;
+
 class SinglePost extends Component {
   state = {
     title: '',
@@ -32,7 +35,7 @@ class SinglePost extends Component {
       `
     };
     
-    fetch("http://localhost:8080/graphql/", {
+    fetch(`${BACKEND_HOST}:${BACKEND_PORT}/graphql`, {
 			method: "POST",
 			headers: {
 				Authorization: "Bearer " + this.props.token,

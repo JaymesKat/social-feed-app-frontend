@@ -12,7 +12,9 @@ import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
 import LoginPage from './pages/Auth/Login';
 import SignupPage from './pages/Auth/Signup';
 import './App.css';
-import auth from './pages/Auth/Auth';
+
+const BACKEND_HOST = process.env.REACT_APP_BACKEND_HOST;
+const	BACKEND_PORT = process.env.REACT_APP_BACKEND_PORT;
 
 class App extends Component {
   state = {
@@ -69,48 +71,48 @@ class App extends Component {
           }
         }
       `};
-    fetch('http://localhost:8080/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(graphqlQuery)
-    })
-      .then(res => {
-        return res.json();
-      })
-      .then(resData => {
-        console.log(resData);
-        if (resData.errors && resData.errors[0].status.code === 422) {
+    fetch(`${BACKEND_HOST}:${BACKEND_PORT}/graphql`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(graphqlQuery)
+		})
+			.then(res => {
+				return res.json();
+			})
+			.then(resData => {
+				console.log(resData);
+				if (resData.errors && resData.errors[0].status.code === 422) {
 					throw new Error("Validation failed.");
 				}
 				if (resData.errors) {
 					console.log("Error!");
 					throw new Error("Could not authenticate you!");
 				}
-        this.setState({
+				this.setState({
 					isAuth: true,
 					token: resData.data.login.token,
 					authLoading: false,
 					userId: resData.data.login.userId
 				});
-        localStorage.setItem("token", resData.data.login.token);
-        localStorage.setItem("userId", resData.data.login.userId);
-        const remainingMilliseconds = 60 * 60 * 1000;
-        const expiryDate = new Date(
-          new Date().getTime() + remainingMilliseconds
-        );
-        localStorage.setItem('expiryDate', expiryDate.toISOString());
-        this.setAutoLogout(remainingMilliseconds);
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({
-          isAuth: false,
-          authLoading: false,
-          error: err
-        });
-      });
+				localStorage.setItem("token", resData.data.login.token);
+				localStorage.setItem("userId", resData.data.login.userId);
+				const remainingMilliseconds = 60 * 60 * 1000;
+				const expiryDate = new Date(
+					new Date().getTime() + remainingMilliseconds
+				);
+				localStorage.setItem("expiryDate", expiryDate.toISOString());
+				this.setAutoLogout(remainingMilliseconds);
+			})
+			.catch(err => {
+				console.log(err);
+				this.setState({
+					isAuth: false,
+					authLoading: false,
+					error: err
+				});
+			});
   };
 
   signupHandler = (event, authData) => {
@@ -126,37 +128,37 @@ class App extends Component {
         }
       `
 		};
-    fetch('http://localhost:8080/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(graphqlQuery)
-    })
-      .then(res => {
-        return res.json();
-      })
-      .then(resData => {
-        if (resData.errors && resData.errors[0].status === 422) {
+    fetch(`${BACKEND_HOST}:{${BACKEND_PORT}}/graphql`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(graphqlQuery)
+		})
+			.then(res => {
+				return res.json();
+			})
+			.then(resData => {
+				if (resData.errors && resData.errors[0].status === 422) {
 					throw new Error(
 						"Validation failed. Make sure the email address isn't used yet!"
 					);
-        }
-        if (resData.errors) {
+				}
+				if (resData.errors) {
 					throw new Error("Creating a user failed!");
 				}
-        console.log(resData);
-        this.setState({ isAuth: false, authLoading: false });
-        this.props.history.replace('/');
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({
-          isAuth: false,
-          authLoading: false,
-          error: err
-        });
-      });
+				console.log(resData);
+				this.setState({ isAuth: false, authLoading: false });
+				this.props.history.replace("/");
+			})
+			.catch(err => {
+				console.log(err);
+				this.setState({
+					isAuth: false,
+					authLoading: false,
+					error: err
+				});
+			});
   };
 
   setAutoLogout = milliseconds => {

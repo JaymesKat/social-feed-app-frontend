@@ -44,8 +44,8 @@ npm install
 Create a `.env` file based on the `.env.example` file and populate following variables
 
 ```
-BACKEND_HOST=
-BACKEND_PORT=
+REACT_APP_BACKEND_HOST=
+REACT_APP_BACKEND_PORT=
 ```
 
 ## Running the application
